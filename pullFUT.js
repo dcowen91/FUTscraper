@@ -1,9 +1,10 @@
 
 var http = require('http');
 var bl = require('bl')
-var baseUrl =  'http://www.easports.com/fifa/ultimate-team/api/fut/item?jsonParamObject=%7B%22page%22:{0}%7D';
 
-// console.log(baseUrl.replace("{0}", 1));
+
+var baseUrl =  'http://www.easports.com/fifa/ultimate-team/api/fut/item?jsonParamObject=%7B%22page%22:{0}%7D';
+var totalPages = 0;
 var result = '';
 
 http.get(baseUrl, function(response)
@@ -22,5 +23,5 @@ function concatData(data)
 function handleData()
 {
 	var jsonBlob = JSON.parse(result)
-	console.log(jsonBlob.totalPages);
+	console.log(totalPages = jsonBlob.totalPages);
 }
