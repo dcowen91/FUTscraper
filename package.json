@@ -1,0 +1,27 @@
+{
+  "name": "FUTscraper",
+  "version": "1.0.0",
+  "description": "scrape fut db",
+  "main": "pullFUT.js",
+  "dependencies": {
+    "bl": "^1.0.0",
+    "http": "^0.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node pullFUT.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dcowen91/FUTscraper.git"
+  },
+  "keywords": [
+    "fifa"
+  ],
+  "author": "Drew Owen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dcowen91/FUTscraper/issues"
+  },
+  "homepage": "https://github.com/dcowen91/FUTscraper"
+}
