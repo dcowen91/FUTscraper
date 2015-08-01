@@ -5,50 +5,53 @@ var bl = require('bl');
 
 var baseUrl =  'http://www.easports.com/fifa/ultimate-team/api/fut/item?jsonParamObject=';
 var totalPages = 0;
-var result = '';
+var arr = [];
 
 http.get(baseUrl, function(response)
 {
 	response.setEncoding("utf8");
-	response.on('data', concatData);
-	response.on('error', console.error);
-	response.on('end', handlePageCount);
+	response.pipe(bl(getPageCount))
 });
 
-function concatData(data)
+function getPageCount(err, data)
 {
-	result += data.toString();
+	totalPages = JSON.parse(data.toString()).totalPages;
+	console.log(totalPages);
+	//716
+	getPage(1);
 }
 
-function handlePageCount()
+function getPage(index)
 {
-	var jsonBlob = JSON.parse(result);
-	result = '';
-	totalPages = jsonBlob.totalPages;
-	console.log(totalPages + "pages");
-	getAllPages();
-}
-
-function getAllPages()
-{
-	//add promise so this is isnt broken
-	for (var i = 1; i <= 1; i++)
+	console.log(index);
+	var pages = {page : index};
+	var curUrl = baseUrl + JSON.stringify(pages);
+	http.get(curUrl, function(response)
 	{
-		var pages = {page : i};
-		var curUrl = baseUrl + JSON.stringify(pages);
-		http.get(curUrl, function(response)
+		response.setEncoding("utf8");
+		response.pipe(bl(function(err, data)
 		{
-			response.setEncoding("utf8");
-			response.on('data', concatData);
-			response.on('error', console.error);
-			response.on('end', concatJson);
-		});
-	}
+			var current =JSON.parse(data.toString());
+			arr.push(current.items);
+
+			if (arr.length == totalPages - 1)
+			{
+				serializeData();
+			}
+			else 
+			{
+				getPage(index +1);
+			}
+		}))
+	});
+
 }
 
-function concatJson()
+function serializeData()
 {
-	var jsonblob = JSON.parse(result);
-	result = '';
-	console.log(jsonblob.items[0].rating + " rated " + jsonblob.items[0].name);
+	for (var i = 0; i < arr.length; i++)
+	{
+		console.log(arr[i][0].rating + " rated " + arr[i][0].name);
+		//Commit to DB of your choice
+	}
 }
