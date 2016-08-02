@@ -1,13 +1,22 @@
+//TODO
+// add serialization
+// modularize
+// 1. pull fut players
+// 2. sync fut prices
+
 
 var http = require('http');
 var bl = require('bl');
+var fs = require('fs');
 
 
 var baseUrl =  'http://www.easports.com/fifa/ultimate-team/api/fut/item?jsonParamObject=';
 var totalPages = 0;
-var arr = [];
+var flatArray = [];
+var params = { ovr: "75:99"};
+var filename = 'playerData.json'
 
-http.get(baseUrl + JSON.stringify({ ovr: "74:99"}), function(response)
+http.get(baseUrl + JSON.stringify(params), function(response)
 {
 	response.setEncoding("utf8");
 	response.pipe(bl(getPageCountAndFetchData))
@@ -26,20 +35,22 @@ function getPageCountAndFetchData(err, data)
 function fetchPagesAndSerialize(index)
 {
 	console.log(index);
-	var params = {page : index, ovr: "74:99"};
+	params.page = index;
 	var currrentUrl = baseUrl + JSON.stringify(params);
 	http.get(currrentUrl, function(response)
 	{
 		response.setEncoding("utf8");
 		response.pipe(bl(function(err, data)
 		{
-			var currentData =JSON.parse(data.toString());
-			arr.push(currentData.items);
+			var currentData =JSON.parse(data.toString()); 
+			var page = currentData.page;
+			flatArray = flatArray.concat(currentData.items);
 
-			if (arr.length == totalPages - 1)
+			if (page == totalPages)
 			{
 				serializeData();
 			}
+
 			else 
 			{
 				fetchPagesAndSerialize(index +1);
@@ -51,9 +62,16 @@ function fetchPagesAndSerialize(index)
 
 function serializeData()
 {
-	for (var i = 0; i < arr.length; i++)
+	fs.writeFile(filename, JSON.stringify(flatArray, null, 4), function(err) 
 	{
-		console.log(arr[i][0].rating + " rated " + arr[i][0].name);
-		//Commit to DB of your choice
-	}
+		if (err)
+		{
+			console.log(err);
+		}
+		else
+		{
+			console.log("\n" + totalPages + " pages of players written to " + filename);
+		}
+	}); 	
+	// Or commit to DB of your choice
 }
