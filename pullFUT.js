@@ -50,7 +50,6 @@ function fetchPagesAndSerialize(index)
 			{
 				serializeData();
 			}
-
 			else 
 			{
 				fetchPagesAndSerialize(index +1);
@@ -62,7 +61,7 @@ function fetchPagesAndSerialize(index)
 
 function serializeData()
 {
-	fs.writeFile(filename, JSON.stringify(flatArray, null, 4), function(err) 
+	fs.writeFile(filename, JSON.stringify(flatArray), function(err) 
 	{
 		if (err)
 		{
